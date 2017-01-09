@@ -28,12 +28,14 @@ void TripletLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     Dtype d1;
     caffe_gpu_dot(vec_size_,
                   positive_class_diff_.gpu_data() + i * vec_size_,
-                  positive_class_diff_.gpu_data() + i * vec_size_);
+                  positive_class_diff_.gpu_data() + i * vec_size_,
+                  &d1);
 
     Dtype d2;
     caffe_gpu_dot(vec_size_,
                   negative_class_diff_.gpu_data() + i * vec_size_,
-                  negative_class_diff_.gpu_data() + i * vec_size_);
+                  negative_class_diff_.gpu_data() + i * vec_size_,
+                  &d2);
 
     loss_vec_[i] = alpha_ + d1 - d2;
     if(loss_vec_[i] < 0)
@@ -41,7 +43,7 @@ void TripletLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     loss += loss_vec_[i];
   }
 
-  Dtype loss = loss / batch_size_ / Dtype(2);
+  loss = loss / batch_size_ / Dtype(2);
   top[0]->mutable_cpu_data()[0] = loss;
 }
 
